@@ -13,9 +13,7 @@ function C = getCentroid( B )
     % Set boundary
     for n=1:size(B,2)
         T(B(1,n),B(2,n)) = 0;
-        disp(n);
     end
-    
     
     % fill the image
     inside = 0;
@@ -33,7 +31,7 @@ function C = getCentroid( B )
             if (T(y,x)==1 && onedge==1)
                 
                 % get end state
-                if (edges > 1 && (T(y+1,x)==0 || T(y+1,x+1)==0))
+                if (edges > 1 && x < size(T,2) && (T(y+1,x)==0 || T(y+1,x+1)==0))
                     endstate = STATE_TOP; 
                 else
                     endstate = STATE_BOTTOM;
@@ -74,14 +72,10 @@ function C = getCentroid( B )
         end
     end
     
-    % Calculate centroid
-    imshow(T);
-    hold on;
     [y,x] = ind2sub(size(T),find(~T));
     cX = sum(x)/length(x);
     cY = sum(y)/length(y);
-    plot(cX,cY,'r.');
     C = [cY; cX];
-    %disp(cX);
+    
 end
 

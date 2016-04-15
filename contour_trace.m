@@ -1,21 +1,22 @@
 % ----
 % DONE
 % ----
+% trace routine radial sweep
+% descriptors
+%   centroid
+%   bounding box
+%   fourier descriptor
 
 % ----
 % TODO
 % ----
-% trace routine for bw image, moore, radial sweep etc
+% more trace routines?
 % descriptors
-%   centroid
-%   bounding box
+%   chain codes
 %   statistical moments
-%   fourier
 %   PCA
 % recognition based on descriptors
 %   check for rotation, translation, scale, projective
-
-
 
 % ----
 % OPTIONAL
@@ -24,20 +25,41 @@
 % b-splines
 
 
-% read image
-I = imread('right.png');
 
-% Turn to bw
-I_bw = im2bw(rgb2gray(I));
-% show image
-figure;
-imshow(I_bw);
-hold on;
 
-B = trace(I_bw);
+% Compare square against scaled and rotated versions
+I = imread('square.png');
+I_square = im2bw(rgb2gray(I));
+I = imread('square_scaled.png');
+I_square_scaled = im2bw(rgb2gray(I));
+I = imread('diamond.png');
+I_diamond = im2bw(rgb2gray(I));
+I = imread('L.png');
+I_L = im2bw(rgb2gray(I));
 
-% Plot boundary points
-for n=1:size(B,2)
-    c = B(:,n);
-    plot(c(2),c(1), 'r.');
-end
+B_square = trace(I_square);
+B_square_scaled = trace(I_square_scaled);
+B_diamond = trace(I_diamond);
+B_L = trace(I_L);
+
+FD_square = getFD(B_square);
+FD_square_scaled = getFD(B_square_scaled);
+FD_diamond = getFD(B_diamond);
+FD_L = getFD(B_L);
+
+D_square = checkFDerror(FD_square, FD_square);
+D_square_scaled = checkFDerror(FD_square_scaled, FD_square);
+D_diamond = checkFDerror(FD_diamond, FD_square);
+D_L = checkFDerror(FD_L, FD_square);
+
+% Test something
+D_diamond_square = checkFDerror(FD_diamond, FD_square);
+D_diamond_L = checkFDerror(FD_diamond, FD_L);
+D_diamond_square_scaled = checkFDerror(FD_diamond, FD_square_scaled);
+
+
+
+
+
+
+
