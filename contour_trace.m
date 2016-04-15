@@ -25,7 +25,7 @@
 
 
 % read image
-I = imread('Random.png');
+I = imread('right.png');
 
 % Turn to bw
 I_bw = im2bw(rgb2gray(I));

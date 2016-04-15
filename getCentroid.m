@@ -74,10 +74,14 @@ function C = getCentroid( B )
         end
     end
     
-    C = T;
-    return;
-    
-    % Calculate
-    
+    % Calculate centroid
+    imshow(T);
+    hold on;
+    [y,x] = ind2sub(size(T),find(~T));
+    cX = sum(x)/length(x);
+    cY = sum(y)/length(y);
+    plot(cX,cY,'r.');
+    C = [cY; cX];
+    %disp(cX);
 end
 
