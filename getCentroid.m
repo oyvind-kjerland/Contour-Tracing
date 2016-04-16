@@ -1,11 +1,6 @@
 function C = getCentroid( B )
     % Get the centroid of the boundary B
-
-    % Get the bounding box of the boundary
     bbox = getBoundingBox(B);
-
-    % Reposition the boundary
-    B = [B(1,:)-bbox(2)+2 ; B(2,:)-bbox(1)+2];
 
     % Create temp mat
     T = ones(bbox(4)+3, bbox(3)+3);
