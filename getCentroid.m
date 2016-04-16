@@ -66,7 +66,7 @@ function C = getCentroid( B )
             end;
         end
     end
-    
+
     [y,x] = ind2sub(size(T),find(~T));
     cX = sum(x)/length(x);
     cY = sum(y)/length(y);

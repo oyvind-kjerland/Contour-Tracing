@@ -2,7 +2,9 @@ function B = trace(I_bw)
     %
     % start contour procedure
     %
-
+    
+    ACTIVE = 1;
+    
     % The boundary points
     B = [];
 
@@ -18,8 +20,8 @@ function B = trace(I_bw)
     brk = 0;
     for y=1:height,
         for x=1:width,
-            % Check if the pixel is black
-            if (I_bw(y,x) == 0)
+            % Check if the pixel is active
+            if (I_bw(y,x) > 0)
                 s = [y;x];
                 brk = 1;
                 break;
@@ -66,8 +68,12 @@ function B = trace(I_bw)
 
             offset = neighbors(:,nIndex);
             c = s + offset;
-
-            if (I_bw(c(1),c(2)) == 0)
+            
+            if (c(1) < 1 || c(1) > height || c(2) < 1 || c(2) > width)
+                continue
+            end
+            
+            if (I_bw(c(1),c(2)) > 0)
                 % set the previous direction
                 prev = -offset;
 

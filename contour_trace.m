@@ -60,29 +60,76 @@ D_diamond_square_scaled = checkFDerror(FD_diamond, FD_square_scaled);
 %}
 
 
-% Obtain database
-database = struct;
-filenames = dir('database/*.png');
+database = createDatabase();
 
-for f=1:length(filenames)
-    filename = filenames(f).name;
-    
-    fullpath = strcat('database/',filename);
 
-    I_DB = imread(fullpath);
-    I_DB = segmentImage(I_DB);
-    B_DB = trace(I_DB);
-    BBOX_DB = getBoundingBox(B_DB);
-    B_DB = repositionBoundary(B_DB);
-    FD_DB = getFD(B_DB);
+I_shapes = imread('shapes.png');
+I_shapes = (segmentImage(I_shapes));
+imshow(I_shapes);
+I_labels = bwlabel(I_shapes);
+% Find unique values
+labels = unique(I_labels);
+
+BS = struct;
+
+% Go through the labels and trace
+for l=1:labels(end)
+    B = trace(I_labels);
+    BS(l).boundary = B;
+    %figure;
+    %plot(B(2,:),B(1,:));
+       
+    % find current label
+    label = I_labels(B(1,1),B(2,1));
     
-    database(f).name = filename;
-    %database(f).I = I_DB;
-    %database(f).B = B_DB;
-    database(f).BBOX = BBOX_DB;
-    database(f).FD = FD_DB;
+    % Remove from labels
+    I_labels(I_labels==label) = 0;
 end
 
+% Plot the image
+figure;
+imshow(I_shapes);
+hold on;
+
+% Check the boundaries and map on the original image
+for b=1:length(BS)
+    B = BS(b).boundary;
+    plot(B(2,:),B(1,:),'r');
+    BBOX = getBoundingBox(B);
+    rectangle('Position',BBOX, 'EdgeColor', 'g');
+    
+    B = repositionBoundary(B);
+    FD = getFD(B);
+    
+    
+    % Check against database
+    minIndex = 0;
+    minError = 10000;
+    for i=1:length(database)
+        error = checkFDerror(FD, database(i).FD);
+        disp(error);
+        if (error < minError)
+            minError = error;
+            minIndex = i;
+        end
+    end
+    
+    name = database(minIndex).name;
+    disp(name);
+    text(BBOX(1),BBOX(2),name,'color','r');
+end
+
+return;
+
+
+
+%{
+B_shapes = trace(I_shapes);
+plot(B_shapes(2,:),B_shapes(1,:));
+I_labels = bwlabel(I_shapes);
+label = I_labels(B_shapes(1,1),B_shapes(2,1));
+I_labels(I_labels==label) = 0;
+return;
 
 % Test an image
 I_test = imread('diamond.png');
@@ -107,4 +154,4 @@ if (minIndex > 0)
 else
     disp('Could not match')
 end
-
+%}
