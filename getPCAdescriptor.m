@@ -29,6 +29,8 @@ d2 = D(2,2);
 %line([0 d1*e1(1)], [0 d1*e1(2)], 'Color', 'g', 'LineWidth', 2);
 %line([0 d2*e2(1)], [0 d2*e2(2)], 'Color', 'g', 'LineWidth', 2);
 
+descriptor = D(1,1) / D(2,2);
+return;
 if (D(1,1) > D(2,2))
     descriptor = D(1,1) / D(2,2);
 else

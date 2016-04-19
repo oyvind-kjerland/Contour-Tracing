@@ -93,11 +93,11 @@ end
 figure;
 imshow(I_shapes);
 hold on;
-
+%pause;
 % Check the boundaries and map on the original image
 for b=1:length(BS)
     B = BS(b).boundary;
-    plot(B(2,:),B(1,:),'b');
+    plot(B(2,:),B(1,:),'b.');
     
     disp(length(BS(b).innerBoundaries));
     
@@ -111,7 +111,7 @@ for b=1:length(BS)
 
             IB = innerBoundaries(ib).boundary;
 
-            plot(IB(2,:),IB(1,:),'g');
+            plot(IB(2,:),IB(1,:),'g.');
             full_boundary = [full_boundary, IB];
             
             numInnerBoundaries = length(innerBoundaries);
@@ -133,7 +133,7 @@ for b=1:length(BS)
     % Check against database
     minIndex = 0;
     minError = 10000;
-    innerBoundaryPenalty = 1;
+    innerBoundaryPenalty = 2;
     
     for i=1:length(database)
         error = checkFDerror(FD, database(i).FD);
@@ -153,7 +153,7 @@ for b=1:length(BS)
                     db_fd = IB_DB(db_ib).FD;
                     ib_minErr = 1000;
                     for q_ib=1:numInnerBoundaries
-                        IB_FD = getFD(B);
+                        IB_FD = getFD(innerBoundaries(q_ib).boundary);
                         ib_err = checkFDerror(IB_FD, db_fd);
                         if (ib_err < ib_minErr)
                             ib_minErr = ib_err;
@@ -169,12 +169,14 @@ for b=1:length(BS)
         %
         
         
-        
+        disp(database(i).name);
         disp(error);
+        disp(numInnerBoundaries);
         
-        % Check PCA error
-        %error = error + abs((pca_d - database(i).PCA_D));
-        
+        % Check PCA error if no inner boundaries
+        if (numInnerBoundaries == 0)
+            %error = error + (abs(pca_d^2 - database(i).PCA_D^2));
+        end;
         
         if (error < minError)
             minError = error;
@@ -183,8 +185,9 @@ for b=1:length(BS)
     end
     
     name = database(minIndex).name;
+    disp('closest match');
     disp(name);
-    text(BBOX(1),BBOX(2),name,'color','r');
+    text(BBOX(1),BBOX(2),name,'color','r','fontsize',14);
 end
 
 return;

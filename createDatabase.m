@@ -35,7 +35,7 @@ for f=1:length(filenames)
     % PCA descriptor
     PCA_D = getPCAdescriptor(FB_DB);
 
-    database(f).name = filename;
+    database(f).name = filename(1:end-4);
     %database(f).I = I_DB;
     %database(f).B = B_DB;
     database(f).BBOX = BBOX_DB;

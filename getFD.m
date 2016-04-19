@@ -6,6 +6,11 @@ C = getCentroid(B);
 
 % Use y as complex plane
 U = (B(2,:) - C(2)) + i * (B(1,:) - C(1));
+%U = sqrt((B(2,:) - C(2)).^2+(B(1,:) - C(1)).^2);
+%figure;
+%plot(U);
+%pause;
+%U = (B(2,:)+i*(B(1,:)));
 
 % Take the fourier transform to obtain coefficients
 F = fft(U);
@@ -14,10 +19,11 @@ F = fft(U);
 F(1) = 0;
 
 num_coeffs = 32;
-num_coeffs = 64;
-
+l = min(num_coeffs, length(F));
 % Make it scale, rotation and starting point invariant
-FD = abs(F(1:32)) / abs(F(2));
+FD = abs(F(1:l)) / abs(F(2));
+FD = [FD,zeros(1,num_coeffs-l)];
+
 return;
 % Take the 32 largest values
 [sortedFD,sortingIndices] = sort(FD,'descend');
