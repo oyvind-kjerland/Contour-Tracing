@@ -6,6 +6,7 @@
 %   centroid
 %   bounding box
 %   fourier descriptor
+%   PCA
 
 % ----
 % TODO
@@ -14,7 +15,6 @@
 % descriptors
 %   chain codes
 %   statistical moments
-%   PCA
 % recognition based on descriptors
 %   check for rotation, translation, scale, projective
 
@@ -75,10 +75,13 @@ BS = struct;
 % Go through the labels and trace
 for l=1:labels(end)
     B = trace(I_labels);
+    
+    %if (l==12)
+        innerBoundaries = getBoundaries(B, I_shapes);
+        BS(l).innerBoundaries = innerBoundaries;
+    %end
     BS(l).boundary = B;
-    %figure;
-    %plot(B(2,:),B(1,:));
-       
+    
     % find current label
     label = I_labels(B(1,1),B(2,1));
     
@@ -94,7 +97,32 @@ hold on;
 % Check the boundaries and map on the original image
 for b=1:length(BS)
     B = BS(b).boundary;
-    plot(B(2,:),B(1,:),'r');
+    plot(B(2,:),B(1,:),'b');
+    
+    disp(length(BS(b).innerBoundaries));
+    
+    full_boundary = B;
+    
+    innerBoundaries = BS(b).innerBoundaries;
+    numInnerBoundaries = 0;
+
+    if (isfield(innerBoundaries,'boundary'))
+        for ib=1:length(innerBoundaries)
+
+            IB = innerBoundaries(ib).boundary;
+
+            plot(IB(2,:),IB(1,:),'g');
+            full_boundary = [full_boundary, IB];
+            
+            numInnerBoundaries = length(innerBoundaries);
+        end
+    end
+    
+    %plot(full_boundary(2,:),full_boundary(1,:));
+    pca_d = getPCAdescriptor(full_boundary);
+
+    
+    
     BBOX = getBoundingBox(B);
     rectangle('Position',BBOX, 'EdgeColor', 'g');
     
@@ -105,9 +133,49 @@ for b=1:length(BS)
     % Check against database
     minIndex = 0;
     minError = 10000;
+    innerBoundaryPenalty = 1;
+    
     for i=1:length(database)
         error = checkFDerror(FD, database(i).FD);
+        
+        
+        %
+        % Check inner boundaries
+        IB_DB = database(i).IB;
+        if (isfield(IB_DB,'boundary'))
+            IB_length = length(IB_DB);
+            if (IB_length > numInnerBoundaries)
+                error = error + (IB_length-numInnerBoundaries)*innerBoundaryPenalty;
+            elseif (IB_length < numInnerBoundaries)
+                error = error + (numInnerBoundaries-IB_length)*innerBoundaryPenalty;
+            else
+                for db_ib=1:IB_length
+                    db_fd = IB_DB(db_ib).FD;
+                    ib_minErr = 1000;
+                    for q_ib=1:numInnerBoundaries
+                        IB_FD = getFD(B);
+                        ib_err = checkFDerror(IB_FD, db_fd);
+                        if (ib_err < ib_minErr)
+                            ib_minErr = ib_err;
+                        end
+                    end
+                    error = error + ib_minErr;
+                end
+                
+            end
+        else
+            error = error + innerBoundaryPenalty * numInnerBoundaries;
+        end
+        %
+        
+        
+        
         disp(error);
+        
+        % Check PCA error
+        %error = error + abs((pca_d - database(i).PCA_D));
+        
+        
         if (error < minError)
             minError = error;
             minIndex = i;

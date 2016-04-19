@@ -13,7 +13,7 @@ function B = trace(I_bw)
     P = [];
 
     % Find size of image
-    [width, height] = size(I_bw);
+    [height, width] = size(I_bw);
 
     % Scan from top left until finding the starting pixel
     s = [1;1];

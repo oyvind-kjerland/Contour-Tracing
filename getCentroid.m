@@ -5,6 +5,14 @@ function C = getCentroid( B )
     % Create temp mat
     T = ones(bbox(4)+3, bbox(3)+3);
     
+    fillBoundary(B,T);
+    
+
+    
+    
+    
+    %{
+    
     % Set boundary
     for n=1:size(B,2)
         T(B(1,n),B(2,n)) = 0;
@@ -66,8 +74,9 @@ function C = getCentroid( B )
             end;
         end
     end
+    %}
 
-    [y,x] = ind2sub(size(T),find(~T));
+    [y,x] = ind2sub(size(T),find(T));
     cX = sum(x)/length(x);
     cY = sum(y)/length(y);
     C = [cY; cX];
